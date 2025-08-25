@@ -20,7 +20,7 @@ func main() {
 	conf := `
 	[kafka]
 	debug=true
-	brokers=["localhost:9094"]
+	brokers=["localhost:9092"]
 	[kafka.client]
         timeout="3s"
 	[kafka.producers.p1]        # 定义了名字为p1的producer
@@ -29,7 +29,6 @@ func main() {
 	[kafka.consumers.c1]        # 定义了名字为c1的consumer
 		topic="sre-infra-test"  # 指定消费的topic
 		groupID="group-1"       # 如果配置了groupID，将初始化为consumerGroup	
-
 	[kafkaConsumerServers.s1]
 	debug=true
 	consumerName="c1"

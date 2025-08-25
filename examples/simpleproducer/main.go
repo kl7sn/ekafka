@@ -18,7 +18,7 @@ func main() {
 	conf := `
 [kafka]
 	debug=true
-	brokers=["localhost:9093"]
+	brokers=["localhost:9092"]
     [kafka.authentication]
         [kafka.authentication.tls]
             enabled=false
@@ -49,8 +49,15 @@ func main() {
 		&ekafka.Message{Value: []byte("Hello World!")},
 		&ekafka.Message{Value: []byte("One!")},
 		&ekafka.Message{Value: []byte("Two!")},
+		&ekafka.Message{Value: []byte("Three!")},
+		&ekafka.Message{Value: []byte("Four!")},
+		&ekafka.Message{Value: []byte("Five!")},
+		&ekafka.Message{Value: []byte("Six!")},
+		&ekafka.Message{Value: []byte("Seven!")},
+		&ekafka.Message{Value: []byte("Eight!")},
+		&ekafka.Message{Value: []byte("Nine!")},
+		&ekafka.Message{Value: []byte("Ten!")},
 	)
-
 	if err != nil {
 		log.Fatal("failed to write messages:", err)
 	}

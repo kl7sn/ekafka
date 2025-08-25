@@ -41,7 +41,34 @@ func Load(key string) *Container {
 			c.config.CompressType = compressTypeGzip
 		}
 	}
+
+	// 为没有显式设置 WatchPartitionChanges 的 consumer 配置应用默认值
+	c.applyDefaultConsumerSettings()
+
 	return c
+}
+
+// applyDefaultConsumerSettings 为 consumer 和 consumerGroup 配置应用默认设置
+func (c *Container) applyDefaultConsumerSettings() {
+	// 为 consumers 应用默认设置
+	for name, consumerConf := range c.config.Consumers {
+		// 如果 WatchPartitionChanges 为 nil（未设置），且该 consumer 配置有效，则设置为默认值 true
+		if consumerConf.WatchPartitionChanges == nil && (consumerConf.Topic != "" || consumerConf.GroupID != "") {
+			watchPartitionChanges := true
+			consumerConf.WatchPartitionChanges = &watchPartitionChanges
+			c.config.Consumers[name] = consumerConf
+		}
+	}
+
+	// 为 consumerGroups 应用默认设置
+	for name, consumerGroupConf := range c.config.ConsumerGroups {
+		// 如果 WatchPartitionChanges 为 nil（未设置），且该 consumerGroup 配置有效，则设置为默认值 true
+		if consumerGroupConf.WatchPartitionChanges == nil && (consumerGroupConf.Topic != "" || consumerGroupConf.GroupID != "") {
+			watchPartitionChanges := true
+			consumerGroupConf.WatchPartitionChanges = &watchPartitionChanges
+			c.config.ConsumerGroups[name] = consumerGroupConf
+		}
+	}
 }
 
 // Build 构建Container
