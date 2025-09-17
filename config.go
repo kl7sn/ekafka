@@ -85,8 +85,8 @@ type consumerConfig struct {
 	MinBytes int `json:"minBytes" toml:"minBytes"`
 	// MaxBytes 向kafka发送请求的包最大值
 	MaxBytes int `json:"maxBytes" toml:"maxBytes"`
-	// WatchPartitionChanges 是否监听分区变化
-	WatchPartitionChanges bool `json:"watchPartitionChanges" toml:"watchPartitionChanges"`
+	// WatchPartitionChanges 是否监听分区变化，nil表示使用默认值(true)
+	WatchPartitionChanges *bool `json:"watchPartitionChanges" toml:"watchPartitionChanges"`
 	// PartitionWatchInterval 监听分区变化时间周期
 	PartitionWatchInterval time.Duration `json:"partitionWatchInterval" toml:"partitionWatchInterval"`
 	// RebalanceTimeout rebalance 超时时间
@@ -111,7 +111,7 @@ type consumerGroupConfig struct {
 	GroupBalancers         []kafka.GroupBalancer `json:"groupBalancers" toml:"groupBalancers"`
 	HeartbeatInterval      time.Duration         `json:"heartbeatInterval" toml:"heartbeatInterval"`
 	PartitionWatchInterval time.Duration         `json:"partitionWatchInterval" toml:"partitionWatchInterval"`
-	WatchPartitionChanges  bool                  `json:"watchPartitionChanges" toml:"watchPartitionChanges"`
+	WatchPartitionChanges  *bool                 `json:"watchPartitionChanges" toml:"watchPartitionChanges"`
 	SessionTimeout         time.Duration         `json:"sessionTimeout" toml:"sessionTimeout"`
 	RebalanceTimeout       time.Duration         `json:"rebalanceTimeout" toml:"rebalanceTimeout"`
 	JoinGroupBackoff       time.Duration         `json:"joinGroupBackoff" toml:"joinGroupBackoff"`
@@ -135,6 +135,22 @@ const (
 	compressHeaderKey  = "Content-Encoding"
 )
 
+// DefaultConsumerConfig 返回默认的 Consumer 配置
+func DefaultConsumerConfig() consumerConfig {
+	watchPartitionChanges := true
+	return consumerConfig{
+		WatchPartitionChanges: &watchPartitionChanges, // 默认启用分区监听
+	}
+}
+
+// DefaultConsumerGroupConfig 返回默认的 ConsumerGroup 配置
+func DefaultConsumerGroupConfig() consumerGroupConfig {
+	watchPartitionChanges := true
+	return consumerGroupConfig{
+		WatchPartitionChanges: &watchPartitionChanges, // 默认启用分区监听
+	}
+}
+
 // DefaultConfig 返回默认配置
 func DefaultConfig() *config {
 	return &config{
@@ -145,5 +161,16 @@ func DefaultConfig() *config {
 			balancerHash:       &kafka.Hash{},
 			balancerRoundRobin: &kafka.RoundRobin{},
 		},
+		// 设置默认的 consumer 和 consumerGroup 配置
+		Consumers:      make(map[string]consumerConfig),
+		ConsumerGroups: make(map[string]consumerGroupConfig),
 	}
+}
+
+// getBoolValue 安全地获取 bool 指针的值，如果为 nil 则返回默认值
+func getBoolValue(ptr *bool, defaultValue bool) bool {
+	if ptr == nil {
+		return defaultValue
+	}
+	return *ptr
 }

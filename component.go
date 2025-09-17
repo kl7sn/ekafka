@@ -75,7 +75,7 @@ func (cmp *Component) Producer(name string) *Producer {
 		cmp.logger.Panic("create mechanism error", elog.String("mechanism", cmp.config.SASLMechanism), elog.String("errorDetail", err.Error()))
 	}
 
-	var transport = &kafka.Transport{}
+	transport := &kafka.Transport{}
 	if mechanism != nil {
 		cmp.logger.Debug("new transport with sasl mechanism", elog.String("mechanism", cmp.config.SASLMechanism), elog.String("username", cmp.config.SASLUserName), elog.String("password", cmp.config.SASLPassword))
 		cmp.newProducerSASLTransport(transport, mechanism)
@@ -157,7 +157,7 @@ func (cmp *Component) Consumer(name string) *Consumer {
 		Partition:              config.Partition,
 		MinBytes:               config.MinBytes,
 		MaxBytes:               config.MaxBytes,
-		WatchPartitionChanges:  config.WatchPartitionChanges,
+		WatchPartitionChanges:  getBoolValue(config.WatchPartitionChanges, true),
 		PartitionWatchInterval: config.PartitionWatchInterval,
 		RebalanceTimeout:       config.RebalanceTimeout,
 		MaxWait:                config.MaxWait,
@@ -216,7 +216,7 @@ func (cmp *Component) ConsumerGroup(name string) *ConsumerGroup {
 		cmp.logger.Panic("consumerGroup config not exists", elog.String("name", name))
 	}
 	// enableAutoRun 是否默认运行，默认值为true
-	var enableAutoRun = true
+	enableAutoRun := true
 	if config.EnableAutoRun != nil {
 		enableAutoRun = *config.EnableAutoRun
 	}
@@ -227,7 +227,7 @@ func (cmp *Component) ConsumerGroup(name string) *ConsumerGroup {
 		Topic:                  config.Topic,
 		HeartbeatInterval:      config.HeartbeatInterval,
 		PartitionWatchInterval: config.PartitionWatchInterval,
-		WatchPartitionChanges:  config.WatchPartitionChanges,
+		WatchPartitionChanges:  getBoolValue(config.WatchPartitionChanges, true),
 		SessionTimeout:         config.SessionTimeout,
 		RebalanceTimeout:       config.RebalanceTimeout,
 		JoinGroupBackoff:       config.JoinGroupBackoff,

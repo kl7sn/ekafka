@@ -41,3 +41,29 @@ func WithRegisterBalancer(balancerName string, balancer Balancer) Option {
 		c.config.balancers[balancerName] = balancer
 	}
 }
+
+// WithConsumerWatchPartitionChanges 为指定的 Consumer 设置 WatchPartitionChanges
+func WithConsumerWatchPartitionChanges(consumerName string, enabled bool) Option {
+	return func(c *Container) {
+		if c.config.Consumers == nil {
+			c.config.Consumers = make(map[string]consumerConfig)
+		}
+		if config, exists := c.config.Consumers[consumerName]; exists {
+			config.WatchPartitionChanges = &enabled
+			c.config.Consumers[consumerName] = config
+		}
+	}
+}
+
+// WithConsumerGroupWatchPartitionChanges 为指定的 ConsumerGroup 设置 WatchPartitionChanges
+func WithConsumerGroupWatchPartitionChanges(consumerGroupName string, enabled bool) Option {
+	return func(c *Container) {
+		if c.config.ConsumerGroups == nil {
+			c.config.ConsumerGroups = make(map[string]consumerGroupConfig)
+		}
+		if config, exists := c.config.ConsumerGroups[consumerGroupName]; exists {
+			config.WatchPartitionChanges = &enabled
+			c.config.ConsumerGroups[consumerGroupName] = config
+		}
+	}
+}
